@@ -1,0 +1,40 @@
+FROM ruby:2.6-slim-buster
+
+ENV REDMICA_USER=redmica
+ENV REDMICA_VER=1.1.0
+ENV REDMICA_ROOT_PATH=/home/redmica/redmica
+
+RUN adduser --disabled-login --gecos 'Redmica' $REDMICA_USER
+
+WORKDIR ${REDMICA_ROOT_PATH}
+
+RUN apt update \
+    && DEBIAN_FRONTEND=noninteractive apt install -y \
+        build-essential \
+        curl \
+        default-libmysqlclient-dev \
+        default-mysql-client \
+        fonts-noto-cjk \
+        git \
+        imagemagick \
+        libcurl4-openssl-dev \
+        libffi-dev \
+        libreadline-dev \
+        libssl-dev \
+        libyaml-dev \
+        nginx \
+        sudo \
+        zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN bash -c "if [ ! -e ${REDMICA_ROOT_PATH} ]; then mkdir ${REDMICA_ROOT_PATH}; fi" \
+    && chown -R ${REDMICA_USER}:${REDMICA_USER} ${REDMICA_ROOT_PATH}
+
+USER ${REDMICA_USER}
+RUN curl -L https://github.com/redmica/redmica/archive/v${REDMICA_VER}.tar.gz | tar -zxf - --strip=1 -C ${REDMICA_ROOT_PATH}
+
+RUN cp ${REDMICA_ROOT_PATH}/config/database.yml.example ${REDMICA_ROOT_PATH}/config/database.yml
+
+RUN bundle install --without development test --path vendor/bundle
+
+USER root

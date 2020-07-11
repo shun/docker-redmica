@@ -1,0 +1,53 @@
+version: "3.7"
+
+x-common:
+  - &DB_ROOTPASS "passw0rd"
+  - &DB_PASS "redmine"
+  - &DB_USER "redmine"
+  - &DB_NAME "redmine"
+
+services:
+  mysql:
+    image: mysql:5
+    environment:
+      MYSQL_ROOT_PASSWORD: *DB_ROOTPASS
+      MYSQL_DATABASE: *DB_NAME
+      MYSQL_USER: *DB_USER
+      MYSQL_PASSWORD: *DB_PASS
+      #MYSQL_ALLOW_EMPTY_PASSWORD:
+      #MYSQL_RANDOM_ROOT_PASSWORD:
+      #MYSQL_ONETIME_PASSWORD:
+      MYSQL_INITDB_SKIP_TZINFO: "yes"
+    volumes:
+      - mysql:/var/lib/mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  redmica:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.mysql
+    depends_on:
+      - mysql
+    ports:
+      - "10080:3000"
+    environment:
+      TZ: "Asia/Tokyo"
+      DB_ADAPTER: mysql2
+      DB_ENCODING: utf8mb4
+      DB_CHARSET: utf8mb4
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: *DB_NAME
+      DB_USER: *DB_USER
+      DB_PASS: *DB_PASS
+    entrypoint: /entrypoint.sh
+    tty: true
+    command: ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-e", "production"]
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ./assets:/assets:ro
+
+volumes:
+  mysql:
+    driver: "local"
+
