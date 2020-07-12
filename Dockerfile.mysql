@@ -28,6 +28,7 @@ RUN adduser --disabled-login --gecos 'Redmica' $REDMICA_USER \
 
 USER ${REDMICA_USER}
 RUN curl -L https://github.com/redmica/redmica/archive/v${REDMICA_VER}.tar.gz | tar -zxf - --strip=1 -C ${REDMICA_ROOT_PATH} \
+    && echo "gem 'puma'" >> $REDMICA_ROOT_PATH/Gemfile \
     && cp ${REDMICA_ROOT_PATH}/config/database.yml.example ${REDMICA_ROOT_PATH}/config/database.yml \
     && bundle install --without development test --path vendor/bundle
 
