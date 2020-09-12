@@ -83,7 +83,12 @@ if [ ! -e /init_done ]; then
   sudo -HEu $REDMICA_USER bundle exec rake generate_secret_token
   RAILS_ENV=production sudo -HEu $REDMICA_USER bundle exec rake db:migrate
   touch /init_done
+  echo "##############################"
+  echo "#"
+  echo "# initial migration done."
+  echo "#"
+  echo "##############################"
 fi
 
-sudo -HEu $REDMICA_USER $@
+exec "$@"
 

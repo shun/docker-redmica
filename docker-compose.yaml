@@ -29,7 +29,7 @@ services:
     depends_on:
       - mysql
     ports:
-      - "10080:3000"
+      - "10080:80"
     environment:
       TZ: "Asia/Tokyo"
       DB_ADAPTER: mysql2
@@ -42,10 +42,12 @@ services:
       DB_PASS: *DB_PASS
     entrypoint: /entrypoint.sh
     tty: true
-    command: ["bundle", "exec", "rails", "s", "-b", "0.0.0.0", "-e", "production"]
+    command: ["/usr/bin/supervisord", "-nc", "/etc/supervisor/supervisord.conf"]
     volumes:
       - ./entrypoint.sh:/entrypoint.sh:ro
       - ./assets:/assets:ro
+      - ./supervisor/conf.d:/etc/supervisor/conf.d:ro
+      - ./nginx/conf.d/default:/etc/nginx/sites-available/default:ro
 
 volumes:
   mysql:
