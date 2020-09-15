@@ -1,0 +1,19 @@
+FROM redmica/redmica:1.1
+
+COPY ./policy.patch /tmp
+RUN apt update \
+    && apt install -y \
+        gcc \
+        libmagic-dev \
+        make \
+        nginx \
+        patch \
+        postgresql-client \
+        sudo \
+        supervisor \
+    && rm -rf /var/lib/apt/lists/* \
+    && patch -u /etc/ImageMagick-6/policy.xml < /tmp/policy.patch \
+    && cat /etc/ImageMagick-6/policy.xml
+
+ENV REDMICA_ROOT_PATH=/usr/src/redmine
+ENV REDMICA_USER=redmine

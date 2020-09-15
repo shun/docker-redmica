@@ -64,12 +64,29 @@ setup_database() {
   sed -ri "s/[{]{2} ?DB_POOL ?[}]{2}/$DB_POOL/g" $fpath
 }
 
-wait_db() {
+wait_db_mysql() {
   until mysqladmin ping -h $DB_HOST -P $DB_PORT --silent;
   do
     echo "Waiting for database connection..."
     sleep 5
   done
+}
+
+wait_db_postgres() {
+  until PGPASSWORD=$DB_PASS psql -h $DB_HOST -U $DB_USER -c '\q';
+  do
+    echo "Waiting for database connection..."
+    sleep 5
+  done
+}
+
+wait_db() {
+  if [ "${DB_ADAPTER}" = "mysql" ]; then
+      wait_db_mysql
+  else
+      wait_db_postgres
+  fi
+
   echo "!! database is ready."
 }
 

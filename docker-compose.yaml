@@ -7,37 +7,42 @@ x-common:
   - &DB_NAME "redmine"
 
 services:
-  mysql:
-    image: mysql:5
+#  metabase:
+#    #restart: always
+#    image: metabase/metabase
+#    depends_on:
+#      - postgres
+#    ports:
+#      - "10081:3000"
+
+  postgres:
+    #restart: always
+    image: kudoshunsuke/docker-redmica-db-postgres
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.postgres
     environment:
-      MYSQL_ROOT_PASSWORD: *DB_ROOTPASS
-      MYSQL_DATABASE: *DB_NAME
-      MYSQL_USER: *DB_USER
-      MYSQL_PASSWORD: *DB_PASS
-      #MYSQL_ALLOW_EMPTY_PASSWORD:
-      #MYSQL_RANDOM_ROOT_PASSWORD:
-      #MYSQL_ONETIME_PASSWORD:
-      MYSQL_INITDB_SKIP_TZINFO: "yes"
-    volumes:
-      - mysql:/var/lib/mysql
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      TZ: Asia/Tokyo
+      POSTGRES_PASSWORD: *DB_PASS
+      POSTGRES_USER: *DB_USER
 
   redmica:
+    #restart: always
     image: kudoshunsuke/docker-redmica
     build:
       context: ./
-      dockerfile: ./Dockerfile.mysql
+      dockerfile: ./Dockerfile.redmica
     depends_on:
-      - mysql
+      - postgres
     ports:
       - "10080:80"
     environment:
-      TZ: "Asia/Tokyo"
-      DB_ADAPTER: mysql2
-      DB_ENCODING: utf8mb4
-      DB_CHARSET: utf8mb4
-      DB_HOST: mysql
-      DB_PORT: 3306
+      TZ: Asia/Tokyo
+      DB_ADAPTER: postgresql
+      DB_ENCODING: utf8
+      DB_CHARSET: utf8
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_NAME: *DB_NAME
       DB_USER: *DB_USER
       DB_PASS: *DB_PASS
@@ -49,8 +54,26 @@ services:
       - ./assets:/assets:ro
       - ./supervisor/conf.d:/etc/supervisor/conf.d:ro
       - ./nginx/conf.d/default:/etc/nginx/sites-available/default:ro
+      - ./plugins:/plugins:ro
+
+  chupa-text-proxy:
+    #restart: always
+    image: groonga/chupa-text:proxy
+    environment:
+      TZ: Asia/Tokyo
+
+  chupa-text:
+    #restart: always
+    image: groonga/chupa-text:ubuntu-latest
+    depends_on:
+      - chupa-text-proxy
+    environment:
+      TZ: Asia/Tokyo
+      http_proxy: http://chupa-text-proxy:3128/
+      https_proxy: http://chupa-text-proxy:3128/
+      RAILS_SERVE_STATIC_FILES: "true"
 
 volumes:
-  mysql:
+  postgres:
     driver: "local"
 

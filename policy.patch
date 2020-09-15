@@ -1,0 +1,10 @@
+--- policy.xml.bk	2020-09-15 14:08:12.047105760 +0000
++++ policy.xml	2020-09-15 14:05:21.000000000 +0000
+@@ -91,6 +91,6 @@
+   <policy domain="coder" rights="none" pattern="PS2" />
+   <policy domain="coder" rights="none" pattern="PS3" />
+   <policy domain="coder" rights="none" pattern="EPS" />
+-  <policy domain="coder" rights="none" pattern="PDF" />
++  <policy domain="coder" rights="read | write" pattern="PDF" />
+   <policy domain="coder" rights="none" pattern="XPS" />
+ </policymap>
