@@ -1,0 +1,16 @@
+git clone https://github.com/redmica/redmine_issues_panel.git
+git clone https://github.com/redmica/redmine_issue_templates.git
+git clone https://github.com/redmica/redmine-view-customize.git view_customize
+git clone https://github.com/redmica/redmine_vividtone_my_page_blocks.git
+git clone https://github.com/AlphaNodes/redmine_messenger.git
+git clone https://github.com/clear-code/redmine_full_text_search.git full_text_search
+git clone https://github.com/akiko-pusu/redmine_banner.git
+git clone https://github.com/akiko-pusu/redmine_issue_badge.git
+git clone https://github.com/haru/redmine_wiki_extensions.git
+git clone https://github.com/bizyman/sidebar_hide.git
+git clone https://github.com/nanego/redmine_preview_pdf.git
+
+bundle update
+bundle install --without development test
+bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+
