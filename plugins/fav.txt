@@ -9,6 +9,7 @@ git clone https://github.com/akiko-pusu/redmine_issue_badge.git
 git clone https://github.com/haru/redmine_wiki_extensions.git
 git clone https://github.com/bizyman/sidebar_hide.git
 git clone https://github.com/nanego/redmine_preview_pdf.git
+git clone https://github.com/ishikawa999/redmine_searchable_selectbox.git
 
 bundle update
 bundle install --without development test
